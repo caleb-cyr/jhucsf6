@@ -7,17 +7,22 @@
 #include <stdlib.h>
 #include <sstream>
 #include <algorithm>
+#include <pthread.h>
+#include <semaphore.h>
 using std::vector;
 using std::map;
 using std::string;
   struct Calc{
    std::map<std::string,int> vars;
    std::vector<std::string> tokenize(const std::string & expr);
+   pthread_mutex_t lock;
    int calcEval(const char *expr, int * result);
   };
 
 extern "C" struct Calc* calc_create(void){
-   return new Calc();
+   struct Calc * myCalc =  new Calc();
+   pthread_mutex_init(&myCalc->lock,NULL);
+   return myCalc;
 }
 
 std::vector<std::string>Calc:: tokenize(const std::string & expr){
@@ -130,12 +135,15 @@ int Calc::calcEval(const char *expr, int * result){
   
   *result = numbVec.back();
   if(myBool){
+    pthread_mutex_lock(&lock);
     vars.insert(std::pair<std::string,int>(variable,numbVec.back()));
+    pthread_mutex_unlock(&lock);
   }
   return numbVec.back();
 }
   
 extern "C" void calc_destroy(struct Calc *calc){
+  pthread_mutex_destroy(&calc->lock);
   delete(calc);  
 }
 

@@ -7,7 +7,10 @@
 void *worker(void * args){
   struct connInfo *myInfo = args;
   pthread_detach(pthread_self());
-  chat_with_client(myInfo->myCalc,myInfo->clientfd);
+  int keep_going = 1;
+  while(keep_going){
+  keep_going = chat_with_client(myInfo->myCalc,myInfo->clientfd);
+  }
   close(myInfo->clientfd);
   free(myInfo);
   return NULL;
@@ -43,6 +46,7 @@ int chat_with_client(struct Calc * myCalc,int client){
       }
     }
   }
+  return 1;
 }
 
 int main(int argc, char **argv) {
@@ -53,12 +57,10 @@ int main(int argc, char **argv) {
    char * webroot = argv[2];
    struct Calc * myCalc = calc_create();
    int client;
+   int server = open_listenfd(port);
    while(1){
-     int server;
-     if((server = open_listenfd(port)) == 0)
-       printf("listening\n");
-     else
-       client = Accept(server,NULL,NULL);
+     client = Accept(server,NULL,NULL);
+     if(client > 0){
      struct connInfo * info = malloc(sizeof(struct connInfo));
      info->clientfd = client;
      info->webroot = webroot;
@@ -66,9 +68,11 @@ int main(int argc, char **argv) {
      pthread_t newThread;
      if(pthread_create(&newThread,NULL,worker,info) != 0)
        return 0;
+     }
    }
    return 0;
 }
+
 
     
   

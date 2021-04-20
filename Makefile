@@ -5,10 +5,10 @@
 
 PROGRAMS = calcTest calcInteractive calcServer
 CC = gcc
-CFLAGS = -g -Wall -Wextra -pedantic -std=gnu11
+CFLAGS = -g -Wall -Wextra -pedantic -lpthread -std=gnu11
 
 CXX = g++
-CXXFLAGS = -D__USE_POSIX -g -Wall -Wextra -pedantic -std=gnu++11
+CXXFLAGS = -D__USE_POSIX -g -lpthread -Wall -Wextra -pedantic -std=gnu++11
 
 .PHONY : solution.zip clean
 
