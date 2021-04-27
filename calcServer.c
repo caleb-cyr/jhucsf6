@@ -8,9 +8,12 @@ void *worker(void * args){
   struct connInfo *myInfo = args;
   pthread_detach(pthread_self());//detatch the thread
   int keep_going = 1;
+  while(keep_going){ //if shutdown command isn't called keep going
   keep_going = chat_with_client(myInfo->myCalc,myInfo->clientfd);
+  //close client connection and free connection struct
   close(myInfo->clientfd);
   free(myInfo);
+  }
   return NULL;
 }
 int chat_with_client(struct Calc * myCalc,int client){
