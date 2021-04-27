@@ -7,8 +7,7 @@ void *worker(void * args){
   //create a client connection struct
   struct connInfo *myInfo = args;
   pthread_detach(pthread_self());//detatch the thread
-  int keep_going = 1;
-  keep_going = chat_with_client(myInfo->myCalc,myInfo->clientfd);
+  chat_with_client(myInfo->myCalc,myInfo->clientfd);
   close(myInfo->clientfd);
   free(myInfo);
   return NULL;
