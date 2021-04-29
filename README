@@ -6,3 +6,5 @@ Caleb- calcServer.c
 Bailey- implemented mutex logic
 
 Together on Zoom- Debug
+
+We made the calculator's shared data safe by using Mutexes. Whenever the calculator accessed a shared variable in the map, we used the mutex to lock access. Then when the calculator was done with that shared variable, we unlocked the mutex.
