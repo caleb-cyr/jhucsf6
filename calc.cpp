@@ -42,11 +42,12 @@ int Calc::calcEval(const char *expr, int * result){
   std::vector<char> opVec = {};
   std::string variable;
   bool myBool = 0;
+  pthread_mutex_lock(&lock);
     //check if variable is being initialized
   if(firstVec.size() > 1 && strcmp(firstVec[1].c_str(),"=") == 0){
     myBool = 1;
     variable = firstVec[0];
-    for(int i = 0; i < variable.size(); i++){
+    for(uint i = 0; i < variable.size(); i++){
       if (!isalpha(variable[i])){
 	return 0;
       }
@@ -55,17 +56,17 @@ int Calc::calcEval(const char *expr, int * result){
     //if variable is being initialized, push operation statement after equal sign onto new vector
   //else give vec the operation statement
   if(myBool){
-    for(int i = 2; i < firstVec.size(); i++){
+    for(uint i = 2; i < firstVec.size(); i++){
       vec.push_back(firstVec[i]);
     }
   }
   else
     vec = firstVec;
   
-  for(int i = 0; i < vec.size();i++){
+  for(uint i = 0; i < vec.size();i++){
     std::string myTemp = vec[i];
     bool isDig = 1;
-    for(int j = 0; j < myTemp.size(); j++){
+    for(uint j = 0; j < myTemp.size(); j++){
       if(!isdigit(myTemp[j]))
 	isDig = 0;
     }
@@ -100,8 +101,9 @@ int Calc::calcEval(const char *expr, int * result){
       if(vars.find(checker) != vars.end()){
 	numbVec.push_back(vars.find(checker)->second);
       }
-      else
+      else{
 	return 0;
+      }
       }
     }
   }
@@ -151,10 +153,12 @@ int Calc::calcEval(const char *expr, int * result){
   *result = numbVec.back();
   //initialize variable if not in the map already
   if(myBool){
-    pthread_mutex_lock(&lock);
+    if(vars.find(variable) != vars.end())
+      vars.at(variable) = numbVec.back();
+    else
     vars.insert(std::pair<std::string,int>(variable,numbVec.back()));
-    pthread_mutex_unlock(&lock);
   }
+  pthread_mutex_unlock(&lock);
   return numbVec.back();
 }
   
